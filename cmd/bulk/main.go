@@ -163,7 +163,6 @@ func main() {
 			return nil
 		}
 
-		log.Printf("Schedule to index %s\n", path)
 		return nil
 	}
 
