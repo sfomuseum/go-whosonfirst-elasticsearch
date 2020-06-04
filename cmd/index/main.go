@@ -6,12 +6,13 @@ import (
 
 import (
 	"context"
-	_ "errors"
+	"errors"
 	"flag"
+	"fmt"
 	es "github.com/elastic/go-elasticsearch/v7"
 	esapi "github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/whosonfirst/go-whosonfirst-index"
-	"github.com/whosonfirst/go-whosonfirst-uri"
+	"github.com/tidwall/gjson"
 	"io"
 	"io/ioutil"
 	"log"
@@ -24,6 +25,8 @@ func main() {
 	es_index := flag.String("elasticsearch-index", "millsfield", "...")
 
 	idx_uri := flag.String("indexer-uri", "repo://", "...")
+
+	// bulk := flag.Bool("bulk", false, "...")
 
 	flag.Parse()
 
@@ -56,18 +59,21 @@ func main() {
 			return err
 		}
 
-		id, uri_args, err := uri.ParseURI(path)
+		body, err := ioutil.ReadAll(fh)
 
 		if err != nil {
-			log.Printf("Failed to parse %s, %v\n", path, err)
-			return nil
+		return err
+		}		
+
+		id_rsp := gjson.GetBytes(body, "properties.wof:id")
+
+		if !id_rsp.Exists(){
+		msg := fmt.Sprintf("%s is missing properties.wof:id", path)
+		   return errors.New(msg)
 		}
 
-		if uri_args.IsAlternate {
-			return nil
-		}
-
-		doc_id := strconv.FormatInt(id, 10)
+		wof_id := id_rsp.Int()
+		doc_id := strconv.FormatInt(wof_id, 10)
 
 		req := esapi.IndexRequest{
 			Index:      *es_index,

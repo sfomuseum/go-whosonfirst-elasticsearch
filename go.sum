@@ -11,8 +11,11 @@ github.com/sfomuseum/go-sfomuseum-elasticsearch v0.1.0 h1:iylB3vAq1o26B7RoJ3zMck
 github.com/sfomuseum/go-sfomuseum-elasticsearch v0.1.0/go.mod h1:LmuY61m4VXLBd6+EarHt1FB0JJLbj3dVi6O/sr56JQQ=
 github.com/sfomuseum/go-sfomuseum-elasticsearch v0.1.1 h1:+gSCfMZHktvxYpPqFDL8TCYoH18R1V7NaAHq5SaXKYA=
 github.com/sfomuseum/go-sfomuseum-elasticsearch v0.1.1/go.mod h1:LmuY61m4VXLBd6+EarHt1FB0JJLbj3dVi6O/sr56JQQ=
+github.com/tidwall/gjson v1.6.0 h1:9VEQWz6LLMUsUl6PueE49ir4Ka6CzLymOAZDxpFsTDc=
 github.com/tidwall/gjson v1.6.0/go.mod h1:P256ACg0Mn+j1RXIDXoss50DeIABTYK1PULOJHhxOls=
+github.com/tidwall/match v1.0.1 h1:PnKP62LPNxHKTwvHHZZzdOAOCtsJTjo6dZLCwpKm5xc=
 github.com/tidwall/match v1.0.1/go.mod h1:LujAq0jyVjBy028G1WhWfIzbpQfMO8bBZ6Tyb0+pL9E=
+github.com/tidwall/pretty v1.0.0 h1:HsD+QiTn7sK6flMKIvNmpqz1qrpP3Ps6jOKIKMooyg4=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/whosonfirst/go-whosonfirst-crawl v0.2.0 h1:Ti39C2TYIO3SP6GFdyObfEGdYYy8Pdhm3reVE7JMkmQ=
 github.com/whosonfirst/go-whosonfirst-crawl v0.2.0/go.mod h1:0t0OFAJ3MpllNw7hI5TpS+wJtx13nzM/DBLYUKJDJu0=
