@@ -7,18 +7,21 @@ import (
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"github.com/cenkalti/backoff/v4"
 	es "github.com/elastic/go-elasticsearch/v7"
 	_ "github.com/elastic/go-elasticsearch/v7/esapi"
+	"github.com/elastic/go-elasticsearch/v7/estransport"
 	"github.com/elastic/go-elasticsearch/v7/esutil"
 	"github.com/tidwall/gjson"
 	"github.com/whosonfirst/go-whosonfirst-index"
 	"io"
 	"io/ioutil"
 	"log"
+	"os"
 	"runtime"
 	"strconv"
 	"time"
@@ -32,18 +35,18 @@ func main() {
 	idx_uri := flag.String("indexer-uri", "repo://", "...")
 
 	workers := flag.Int("workers", runtime.NumCPU(), "...")
-	flush_bytes := flag.Int("flush", 5e+6, "Flush threshold in bytes")
-
-	// bulk := flag.Bool("bulk", false, "...")
+	debug := flag.Bool("debug", false, "...")
 
 	flag.Parse()
 
 	ctx := context.Background()
 
 	retryBackoff := backoff.NewExponentialBackOff()
+	log.Println(retryBackoff)
 
 	es_cfg := es.Config{
-		Addresses:     []string{*es_endpoint},
+		Addresses: []string{*es_endpoint},
+
 		RetryOnStatus: []int{502, 503, 504, 429},
 		RetryBackoff: func(i int) time.Duration {
 			if i == 1 {
@@ -52,6 +55,17 @@ func main() {
 			return retryBackoff.NextBackOff()
 		},
 		MaxRetries: 5,
+	}
+
+	if *debug {
+
+		es_logger := &estransport.ColorLogger{
+			Output:             os.Stdout,
+			EnableRequestBody:  true,
+			EnableResponseBody: true,
+		}
+
+		es_cfg.Logger = es_logger
 	}
 
 	es_client, err := es.NewClient(es_cfg)
@@ -68,46 +82,18 @@ func main() {
 
 	// https://github.com/elastic/go-elasticsearch/blob/master/_examples/bulk/indexer.go
 
-	bi, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
+	bi_cfg := esutil.BulkIndexerConfig{
 		Index:         *es_index,
 		Client:        es_client,
 		NumWorkers:    *workers,
-		FlushBytes:    int(*flush_bytes),
 		FlushInterval: 30 * time.Second,
-	})
+	}
+
+	bi, err := esutil.NewBulkIndexer(bi_cfg)
 
 	if err != nil {
 		log.Fatalf("Error creating the indexer: %s", err)
 	}
-
-	defer bi.Close(ctx)
-
-	/*
-	index_record := func(ctx context.Context, doc_id string, fh io.Reader) error {
-
-		req := esapi.IndexRequest{
-			Index:      *es_index,
-			DocumentID: doc_id,
-			Body:       fh,
-			Refresh:    "true",
-		}
-
-		rsp, err := req.Do(ctx, es_client)
-
-		if err != nil {
-			return err
-		}
-
-		defer rsp.Body.Close()
-
-		if rsp.IsError() {
-			body, _ := ioutil.ReadAll(rsp.Body)
-			return errors.New(string(body))
-		}
-
-		return nil
-	}
-	*/
 
 	cb := func(ctx context.Context, fh io.Reader, args ...interface{}) error {
 
@@ -130,18 +116,35 @@ func main() {
 			return errors.New(msg)
 		}
 
+		// FIX ME : CHECK FOR ALT FILES - ADJUST doc_id ACCORDINGLY
+
 		wof_id := id_rsp.Int()
 		doc_id := strconv.FormatInt(wof_id, 10)
 
 		// manipulate body here...
 
+		var f interface{}
+		err = json.Unmarshal(body, &f)
+
+		if err != nil {
+			msg := fmt.Sprintf("Failed to unmarshal %s, %v", path, err)
+			return errors.New(msg)
+		}
+
+		enc_f, err := json.Marshal(f)
+
+		if err != nil {
+			msg := fmt.Sprintf("Failed to marshal %s, %v", path, err)
+			return errors.New(msg)
+		}
+
 		bulk_item := esutil.BulkIndexerItem{
 			Action:     "index",
 			DocumentID: doc_id,
-			Body:       bytes.NewReader(body),
+			Body:       bytes.NewReader(enc_f),
 
 			OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem) {
-				log.Printf("Indexed %s\n", path)
+				// log.Printf("Indexed %s\n", path)
 			},
 
 			OnFailure: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem, err error) {
@@ -155,12 +158,12 @@ func main() {
 
 		err = bi.Add(ctx, bulk_item)
 
-		// err = index_record(ctx, doc_id, br)
-
 		if err != nil {
-			log.Printf("Failed to index %s, %v", path, err)
+			log.Printf("Failed to schedule %s, %v", path, err)
+			return nil
 		}
 
+		log.Printf("Schedule to index %s\n", path)
 		return nil
 	}
 
@@ -178,4 +181,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	err = bi.Close(ctx)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stats := bi.Stats()
+	enc, _ := json.Marshal(stats)
+	log.Println(string(enc))
 }
