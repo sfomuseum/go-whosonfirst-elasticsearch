@@ -6,12 +6,14 @@ import (
 
 import (
 	"context"
+	"errors"
 	"flag"
-	es_client "github.com/sfomuseum/go-sfomuseum-elasticsearch/client"
-	es_index "github.com/sfomuseum/go-sfomuseum-elasticsearch/index"
+	es "github.com/elastic/go-elasticsearch/v7"
+	esapi "github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/whosonfirst/go-whosonfirst-index"
 	"github.com/whosonfirst/go-whosonfirst-uri"
 	"io"
+	"io/ioutil"
 	"log"
 	"strconv"
 )
@@ -19,7 +21,7 @@ import (
 func main() {
 
 	es_endpoint := flag.String("elasticsearch-endpoint", "http://localhost:9200", "...")
-	es_index_name := flag.String("elasticsearch-index", "sfomuseum", "...")
+	es_index := flag.String("elasticsearch-index", "millsfield", "...")
 
 	idx_uri := flag.String("indexer-uri", "repo://", "...")
 
@@ -30,25 +32,23 @@ func main() {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	cl, err := es_client.NewClientWithEndpoint(*es_endpoint)
+	es_cfg := es.Config{
+		Addresses: []string{*es_endpoint},
+	}
+
+	es_client, err := es.NewClient(es_cfg)
 
 	if err != nil {
 		log.Fatalf("Failed to create ES client, %v", err)
 	}
 
-	_, err = cl.Indices.Create(*es_index_name)
+	_, err = es_client.Indices.Create(*es_index)
 
 	if err != nil {
 		log.Fatalf("Failed to create ES index, %v", err)
 	}
 
-	done := false
-
 	cb := func(ctx context.Context, fh io.Reader, args ...interface{}) error {
-
-		if done {
-			return nil
-		}
 
 		path, err := index.PathForContext(ctx)
 
@@ -66,9 +66,32 @@ func main() {
 			return nil
 		}
 
-		str_id := strconv.FormatInt(id, 10)
+		doc_id := strconv.FormatInt(id, 10)
 
-		return es_index.IndexDocumentWithReader(ctx, cl, "flights", str_id, fh)
+		req := esapi.IndexRequest{
+			Index:      *es_index,
+			DocumentID: doc_id,
+			Body:       fh,
+			Refresh:    "true",
+		}
+
+		rsp, err := req.Do(ctx, es_client)
+
+		if err != nil {
+			return err
+		}
+
+		defer rsp.Body.Close()
+
+		switch rsp.StatusCode {
+		case 200, 201:
+		// pass
+		default:
+			body, _ := ioutil.ReadAll(rsp.Body)
+			return errors.New(string(body))
+		}
+
+		return nil
 	}
 
 	i, err := index.NewIndexer(*idx_uri, cb)
