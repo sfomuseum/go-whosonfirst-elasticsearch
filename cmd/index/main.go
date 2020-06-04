@@ -6,7 +6,7 @@ import (
 
 import (
 	"context"
-	"errors"
+	_ "errors"
 	"flag"
 	es "github.com/elastic/go-elasticsearch/v7"
 	esapi "github.com/elastic/go-elasticsearch/v7/esapi"
@@ -59,7 +59,8 @@ func main() {
 		id, uri_args, err := uri.ParseURI(path)
 
 		if err != nil {
-			return err
+			log.Printf("Failed to parse %s, %v\n", path, err)
+			return nil
 		}
 
 		if uri_args.IsAlternate {
@@ -88,7 +89,9 @@ func main() {
 		// pass
 		default:
 			body, _ := ioutil.ReadAll(rsp.Body)
-			return errors.New(string(body))
+			// return errors.New(string(body))
+
+			log.Println(string(body))
 		}
 
 		return nil
