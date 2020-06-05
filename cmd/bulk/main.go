@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"github.com/cenkalti/backoff/v4"
 	es "github.com/elastic/go-elasticsearch/v7"
-	_ "github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/elastic/go-elasticsearch/v7/estransport"
 	"github.com/elastic/go-elasticsearch/v7/esutil"
 	"github.com/tidwall/gjson"
@@ -33,6 +32,8 @@ func main() {
 	es_index := flag.String("elasticsearch-index", "millsfield", "...")
 
 	idx_uri := flag.String("indexer-uri", "repo://", "...")
+
+	index_alt := flag.Bool("index-alt-files", false, "...")
 
 	workers := flag.Int("workers", runtime.NumCPU(), "...")
 	debug := flag.Bool("debug", false, "...")
@@ -116,10 +117,19 @@ func main() {
 			return errors.New(msg)
 		}
 
-		// FIX ME : CHECK FOR ALT FILES - ADJUST doc_id ACCORDINGLY
-
 		wof_id := id_rsp.Int()
 		doc_id := strconv.FormatInt(wof_id, 10)
+
+		alt_rsp := gjson.GetBytes(body, "properties.src:alt_label")
+
+		if alt_rsp.Exists() {
+
+			if !*index_alt {
+				return nil
+			}
+
+			doc_id = fmt.Sprintf("%s-%s", doc_id, alt_rsp.String())
+		}
 
 		// manipulate body here...
 
