@@ -7,11 +7,12 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
 	"github.com/whosonfirst/go-whosonfirst-placetypes"
+	"log"
 )
 
 func AppendPlacetypeDetails(ctx context.Context, body []byte) ([]byte, error) {
 
-	var root gjson.Result
+	root := gjson.ParseBytes(body)
 
 	props_rsp := gjson.GetBytes(body, "properties")
 
@@ -22,6 +23,9 @@ func AppendPlacetypeDetails(ctx context.Context, body []byte) ([]byte, error) {
 	pt_rsp := root.Get("wof:placetype")
 
 	if !pt_rsp.Exists() {
+
+		log.Printf("WHAT %T\n", pt_rsp)
+		log.Println(string(body))
 		return nil, errors.New("Missing wof:placetype property")
 	}
 

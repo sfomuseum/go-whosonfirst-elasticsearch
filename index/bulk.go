@@ -187,7 +187,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 			// prepare_funcs = append(prepare_funcs, document.ExtractProperties)
 		}
 
-		prepare_funcs = append(prepare_funcs, document.Flatten)
+		prepare_funcs = append(prepare_funcs, document.PrepareSpelunkerV1Document)
 
 		for _, f := range prepare_funcs {
 
@@ -217,7 +217,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 			return errors.New(msg)
 		}
 
-		log.Println(string(enc_f))
+		// log.Println(string(enc_f))
 
 		bulk_item := esutil.BulkIndexerItem{
 			Action:     "index",

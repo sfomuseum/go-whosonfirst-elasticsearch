@@ -11,7 +11,7 @@ import (
 
 func AppendNameStats(ctx context.Context, body []byte) ([]byte, error) {
 
-	var root gjson.Result
+     root := gjson.ParseBytes(body)
 
 	props_rsp := gjson.GetBytes(body, "properties")
 

@@ -4,34 +4,40 @@ import (
 	"context"
 )
 
-func PrepareSpeunkerV1Document(ctx context.Context, body []byte) ([]byte, error) {
+func PrepareSpelunkerV1Document(ctx context.Context, body []byte) ([]byte, error) {
 
-	var prepped []byte
+	prepped, err := ExtractProperties(ctx, body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return AppendSpelunkerV1Properties(ctx, prepped)
+}
+
+func AppendSpelunkerV1Properties(ctx context.Context, body []byte) ([]byte, error) {
+
 	var err error
 
-	prepped, err = ExtractProperties(ctx, body)
+	body, err = AppendNameStats(ctx, body)
 
 	if err != nil {
 		return nil, err
 	}
 
-	prepped, err = AppendNameStats(ctx, prepped)
+	body, err = AppendConcordancesStats(ctx, body)
 
 	if err != nil {
 		return nil, err
 	}
 
-	prepped, err = AppendConcordancesStats(ctx, prepped)
+	body, err = AppendPlacetypeDetails(ctx, body)
 
 	if err != nil {
 		return nil, err
 	}
 
-	prepped, err = AppendPlacetypeDetails(ctx, prepped)
+	// to do: categories and machine tags...
 
-	if err != nil {
-		return nil, err
-	}
-
-	return prepped, nil
+	return body, nil
 }

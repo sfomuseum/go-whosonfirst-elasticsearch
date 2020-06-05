@@ -2,7 +2,6 @@ package document
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
@@ -10,7 +9,7 @@ import (
 
 func AppendConcordancesStats(ctx context.Context, body []byte) ([]byte, error) {
 
-	var root gjson.Result
+     root := gjson.ParseBytes(body)
 
 	props_rsp := gjson.GetBytes(body, "properties")
 
@@ -21,7 +20,7 @@ func AppendConcordancesStats(ctx context.Context, body []byte) ([]byte, error) {
 	concordances_rsp := root.Get("wof:concordances")
 
 	if !concordances_rsp.Exists() {
-		return nil, errors.New("Missing wof:concordances property")
+		return body, nil
 	}
 
 	sources := make([]string, 0)
