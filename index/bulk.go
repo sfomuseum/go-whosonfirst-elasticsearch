@@ -1,4 +1,4 @@
-package tools
+package index
 
 import (
 	"bytes"
@@ -13,8 +13,9 @@ import (
 	"github.com/elastic/go-elasticsearch/v7/esutil"
 	"github.com/sfomuseum/go-flags/flagset"
 	"github.com/sfomuseum/go-flags/lookup"
+	"github.com/sfomuseum/go-whosonfirst-elasticsearch/document"
 	"github.com/tidwall/gjson"
-	"github.com/whosonfirst/go-whosonfirst-index"
+	iterator "github.com/whosonfirst/go-whosonfirst-index"
 	"io"
 	"io/ioutil"
 	"log"
@@ -31,12 +32,7 @@ const FLAG_INDEX_ALT string = "index-alt-files"
 const FLAG_INDEX_PROPS string = "index-only-properties"
 const FLAG_WORKERS string = "workers"
 
-type BulkToolChannels struct {
-	Done  chan bool
-	Error chan error
-}
-
-func NewBulkToolFlagSet(ctx context.Context) (*flag.FlagSet, error) {
+func NewBulkIndexerFlagSet(ctx context.Context) (*flag.FlagSet, error) {
 
 	fs := flagset.NewFlagSet("bulk")
 
@@ -52,11 +48,7 @@ func NewBulkToolFlagSet(ctx context.Context) (*flag.FlagSet, error) {
 	return fs, nil
 }
 
-func RunBulkToolWithFlagSetAndChannels(ctx context.Context, fs *flag.FlagSet, channels *BulkToolChannels) (*esutil.BulkIndexerStats, error) {
-     return nil, errors.New("Not implemented")
-}
-
-func RunBulkToolWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.BulkIndexerStats, error) {
+func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.BulkIndexerStats, error) {
 
 	es_endpoint, err := lookup.StringVar(fs, FLAG_ES_ENDPOINT)
 
@@ -153,7 +145,7 @@ func RunBulkToolWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.Bulk
 
 	cb := func(ctx context.Context, fh io.Reader, args ...interface{}) error {
 
-		path, err := index.PathForContext(ctx)
+		path, err := iterator.PathForContext(ctx)
 
 		if err != nil {
 			return err
@@ -188,23 +180,22 @@ func RunBulkToolWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.Bulk
 
 		// START OF manipulate body here...
 
+		prepare_funcs := make([]document.PrepareDocumentFunc, 0)
+
 		if index_only_props {
 
-			props_rsp := gjson.GetBytes(body, "properties")
+			prepare_funcs = append(prepare_funcs, document.OnlyProps)
+		}
 
-			if !props_rsp.Exists() {
-				msg := fmt.Sprintf("%s is missing properties")
-				return errors.New(msg)
-			}
+		for _, f := range prepare_funcs {
 
-			props_body, err := json.Marshal(props_rsp.Value())
+			new_body, err := f(ctx, body)
 
 			if err != nil {
-				msg := fmt.Sprintf("Failed to encode properties for %s, %v", path, err)
-				return errors.New(msg)
+				return err
 			}
 
-			body = props_body
+			body = new_body
 		}
 
 		// END OF manipulate body here...
@@ -252,7 +243,7 @@ func RunBulkToolWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.Bulk
 		return nil
 	}
 
-	i, err := index.NewIndexer(idx_uri, cb)
+	i, err := iterator.NewIndexer(idx_uri, cb)
 
 	if err != nil {
 		return nil, err

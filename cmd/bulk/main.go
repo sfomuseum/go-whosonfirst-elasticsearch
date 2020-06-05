@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/sfomuseum/go-flags/flagset"
-	"github.com/sfomuseum/go-whosonfirst-elasticsearch-index/tools"
+	"github.com/sfomuseum/go-whosonfirst-elasticsearch/index"
 	"log"
 )
 
@@ -17,7 +17,7 @@ func main() {
 
 	ctx := context.Background()
 
-	fs, err := tools.NewBulkToolFlagSet(ctx)
+	fs, err := index.NewBulkIndexerFlagSet(ctx)
 
 	if err != nil {
 		log.Fatalf("Failed to create new flagset, %v", err)
@@ -25,7 +25,7 @@ func main() {
 
 	flagset.Parse(fs)
 
-	stats, err := tools.RunBulkToolWithFlagSet(ctx, fs)
+	stats, err := index.RunBulkIndexerWithFlagSet(ctx, fs)
 
 	if err != nil {
 		log.Fatalf("Failed to run bulk tool, %v", err)

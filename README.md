@@ -1,1 +1,1 @@
-# go-whosonfirst-elasticsearch-index
+# go-whosonfirst-elasticsearch
