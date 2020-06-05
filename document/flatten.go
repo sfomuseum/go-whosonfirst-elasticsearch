@@ -14,7 +14,7 @@ func Flatten(ctx context.Context, body []byte) ([]byte, error) {
 
 	rsp := gjson.ParseBytes(body)
 
-	for x, details := range rsp.Map() {
+	for _, details := range rsp.Map() {
 
 		for k, v := range details.Map() {
 
