@@ -13,8 +13,10 @@ github.com/sfomuseum/go-flags/lookup
 github.com/tidwall/gjson
 # github.com/tidwall/match v1.0.1
 github.com/tidwall/match
-# github.com/tidwall/pretty v1.0.0
+# github.com/tidwall/pretty v1.0.1
 github.com/tidwall/pretty
+# github.com/tidwall/sjson v1.1.1
+github.com/tidwall/sjson
 # github.com/whosonfirst/go-whosonfirst-crawl v0.2.0
 github.com/whosonfirst/go-whosonfirst-crawl
 # github.com/whosonfirst/go-whosonfirst-index v0.3.0

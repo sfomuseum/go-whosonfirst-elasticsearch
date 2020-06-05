@@ -184,8 +184,10 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 
 		if index_only_props {
 
-			prepare_funcs = append(prepare_funcs, document.OnlyProps)
+			// prepare_funcs = append(prepare_funcs, document.ExtractProperties)
 		}
+
+		prepare_funcs = append(prepare_funcs, document.Flatten)
 
 		for _, f := range prepare_funcs {
 
@@ -214,6 +216,8 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 			msg := fmt.Sprintf("Failed to marshal %s, %v", path, err)
 			return errors.New(msg)
 		}
+
+		log.Println(string(enc_f))
 
 		bulk_item := esutil.BulkIndexerItem{
 			Action:     "index",
