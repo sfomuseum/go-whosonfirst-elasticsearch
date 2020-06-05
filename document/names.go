@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-func AppendNameCounts(ctx context.Context, body []byte) ([]byte, error) {
+func AppendNameStats(ctx context.Context, body []byte) ([]byte, error) {
 
 	var root gjson.Result
 

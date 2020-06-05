@@ -9,4 +9,5 @@ require (
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/sjson v1.1.1
 	github.com/whosonfirst/go-whosonfirst-index v0.3.0
+	github.com/whosonfirst/go-whosonfirst-placetypes v0.2.4
 )

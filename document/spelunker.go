@@ -15,7 +15,19 @@ func PrepareSpeunkerV1Document(ctx context.Context, body []byte) ([]byte, error)
 		return nil, err
 	}
 
-	prepped, err = AppendNameCounts(ctx, prepped)
+	prepped, err = AppendNameStats(ctx, prepped)
+
+	if err != nil {
+		return nil, err
+	}
+
+	prepped, err = AppendConcordancesStats(ctx, prepped)
+
+	if err != nil {
+		return nil, err
+	}
+
+	prepped, err = AppendPlacetypeDetails(ctx, prepped)
 
 	if err != nil {
 		return nil, err
