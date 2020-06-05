@@ -6,6 +6,9 @@ github.com/elastic/go-elasticsearch/v7/esapi
 github.com/elastic/go-elasticsearch/v7/estransport
 github.com/elastic/go-elasticsearch/v7/esutil
 github.com/elastic/go-elasticsearch/v7/internal/version
+# github.com/sfomuseum/go-flags v0.3.1
+github.com/sfomuseum/go-flags/flagset
+github.com/sfomuseum/go-flags/lookup
 # github.com/tidwall/gjson v1.6.0
 github.com/tidwall/gjson
 # github.com/tidwall/match v1.0.1

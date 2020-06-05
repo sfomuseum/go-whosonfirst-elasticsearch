@@ -11,6 +11,8 @@ github.com/elastic/go-elasticsearch/v7 v7.7.0 h1:oQBx/S3RiaH0/kiP0scYSay9xgSmVAY
 github.com/elastic/go-elasticsearch/v7 v7.7.0/go.mod h1:OJ4wdbtDNk5g503kvlHLyErCgQwwzmDtaFC4XyOxXA4=
 github.com/natefinch/atomic v0.0.0-20150920032501-a62ce929ffcc h1:7xGrl4tTpBQu5Zjll08WupHyq+Sp0Z/adtyf1cfk3Q8=
 github.com/natefinch/atomic v0.0.0-20150920032501-a62ce929ffcc/go.mod h1:1rLVY/DWf3U6vSZgH16S7pymfrhK2lcUlXjgGglw/lY=
+github.com/sfomuseum/go-flags v0.3.1 h1:6QZwQz1Dgy6t8ty+S7aR3iBSq8+0UR5/R3SNXHC8xxI=
+github.com/sfomuseum/go-flags v0.3.1/go.mod h1:54KCZIGmvZkIOrSCHSNMvgSTKH2gJRJyISH+AiI+55w=
 github.com/sfomuseum/go-sfomuseum-elasticsearch v0.1.0 h1:iylB3vAq1o26B7RoJ3zMckfi/SRefBLvD1FulRZ2/C4=
 github.com/sfomuseum/go-sfomuseum-elasticsearch v0.1.0/go.mod h1:LmuY61m4VXLBd6+EarHt1FB0JJLbj3dVi6O/sr56JQQ=
 github.com/sfomuseum/go-sfomuseum-elasticsearch v0.1.1 h1:+gSCfMZHktvxYpPqFDL8TCYoH18R1V7NaAHq5SaXKYA=
