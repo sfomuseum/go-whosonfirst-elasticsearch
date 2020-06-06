@@ -30,6 +30,8 @@ const FLAG_ES_INDEX string = "elasticsearch-index"
 const FLAG_INDEXER_URI string = "indexer-uri"
 const FLAG_INDEX_ALT string = "index-alt-files"
 const FLAG_INDEX_PROPS string = "index-only-properties"
+const FLAG_INDEX_SPELUNKER_V1 string = "index-spelunker-v1"
+const FLAG_APPEND_SPELUNKER_V1 string = "append-spelunker-v1-properties"
 const FLAG_WORKERS string = "workers"
 
 func NewBulkIndexerFlagSet(ctx context.Context) (*flag.FlagSet, error) {
@@ -41,6 +43,8 @@ func NewBulkIndexerFlagSet(ctx context.Context) (*flag.FlagSet, error) {
 	fs.String(FLAG_INDEXER_URI, "repo://", "...")
 	fs.Bool(FLAG_INDEX_ALT, false, "...")
 	fs.Bool(FLAG_INDEX_PROPS, false, "...")
+	fs.Bool(FLAG_INDEX_SPELUNKER_V1, false, "...")
+	fs.Bool(FLAG_APPEND_SPELUNKER_V1, false, "...")
 	fs.Int(FLAG_WORKERS, runtime.NumCPU(), "...")
 
 	// debug := fs.Bool("debug", false, "...")
@@ -84,6 +88,31 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 
 	if err != nil {
 		return nil, err
+	}
+
+	index_spelunker_v1, err := lookup.BoolVar(fs, FLAG_INDEX_SPELUNKER_V1)
+
+	if err != nil {
+		return nil, err
+	}
+
+	append_spelunker_v1, err := lookup.BoolVar(fs, FLAG_APPEND_SPELUNKER_V1)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if index_spelunker_v1 {
+
+		if index_only_props {
+			msg := fmt.Sprintf("-%s can not be used when -%s is enabled", FLAG_INDEX_PROPS, FLAG_INDEX_SPELUNKER_V1)
+			return nil, errors.New(msg)
+		}
+
+		if append_spelunker_v1 {
+			msg := fmt.Sprintf("-%s can not be used when -%s is enabled", FLAG_APPEND_SPELUNKER_V1, FLAG_INDEX_SPELUNKER_V1)
+			return nil, errors.New(msg)
+		}
 	}
 
 	retry := backoff.NewExponentialBackOff()
@@ -182,12 +211,17 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 
 		prepare_funcs := make([]document.PrepareDocumentFunc, 0)
 
-		if index_only_props {
-
-			// prepare_funcs = append(prepare_funcs, document.ExtractProperties)
+		if index_spelunker_v1 {
+			prepare_funcs = append(prepare_funcs, document.PrepareSpelunkerV1Document)
 		}
 
-		prepare_funcs = append(prepare_funcs, document.PrepareSpelunkerV1Document)
+		if index_only_props {
+			prepare_funcs = append(prepare_funcs, document.ExtractProperties)
+		}
+
+		if append_spelunker_v1 {
+			prepare_funcs = append(prepare_funcs, document.AppendSpelunkerV1Properties)
+		}
 
 		for _, f := range prepare_funcs {
 
@@ -255,6 +289,8 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 
 	paths := fs.Args()
 
+	t1 := time.Now()
+
 	err = i.Index(ctx, paths...)
 
 	if err != nil {
@@ -266,6 +302,8 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("Processed %d files in %v\n", i.Indexed, time.Since(t1))
 
 	stats := bi.Stats()
 	return &stats, nil

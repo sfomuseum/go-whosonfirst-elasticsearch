@@ -9,7 +9,7 @@ import (
 
 func AppendConcordancesStats(ctx context.Context, body []byte) ([]byte, error) {
 
-     root := gjson.ParseBytes(body)
+	root := gjson.ParseBytes(body)
 
 	props_rsp := gjson.GetBytes(body, "properties")
 
