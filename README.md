@@ -2,7 +2,7 @@
 
 ## Important
 
-This is work in progress. Changes should be expected and documentation to follow.
+This is work in progress. Changes should be expected and comprehensive documentation to follow.
 
 ## Tools
 
@@ -16,24 +16,39 @@ go build -mod vendor -o bin/es-whosonfirst-index cmd/es-whosonfirst-index/main.g
 ### es-whosonfirst-index
 
 ```
-> bin/es-whosonfirst-index -h
+> ./bin/es-whosonfirst-index -h
   -append-spelunker-v1-properties
-	...
+    	Append and index auto-generated Whos On First Spelunker properties.
   -elasticsearch-endpoint string
-    			  ... (default "http://localhost:9200")
+    	A fully-qualified Elasticsearch endpoint. (default "http://localhost:9200")
   -elasticsearch-index string
-    		       ... (default "millsfield")
+    	A valid Elasticsearch index. (default "millsfield")
   -index-alt-files
-	...
+    	Index alternate geometries.
   -index-only-properties
-	...
+    	Only index GeoJSON Feature properties (not geometries).
   -index-spelunker-v1
-	...
+    	Index GeoJSON Feature properties inclusive of auto-generated Whos On First Spelunker properties.
   -indexer-uri string
-    	       ... (default "repo://")
+    	A valid whosonfirst/go-whosonfirst-index URI string. (default "repo://")
   -workers int
-    	   ... (default 2)
+    	The number of concurrent workers to index data using. Default is the value of runtime.NumCPU().
+```	
+
+For example:
+
 ```
+$> bin/es-whosonfirst-index \
+	-index-spelunker-v1
+	-elasticsearch-index whosonfirst \
+	/usr/local/data/whosonfirst-data-admin-ca
+```
+
+### Known-knowns
+
+#### index-spelunker-v1
+
+* Support for generating `date:` properties derived from `edtf:` property values is currently not available. This is currently blocked on the lack of a Go language `Extended DateTime Format` parser.
 
 ## Elasticsearch
 
@@ -42,3 +57,4 @@ This code assumes Elasticsearch 7.x
 ## See also
 
 * https://github.com/elastic/go-elasticsearch
+* https://github.com/whosonfirst/go-whosonfirst-index
