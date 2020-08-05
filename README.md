@@ -6,10 +6,17 @@ This is work in progress. Changes should be expected and documentation to follow
 
 ## Tools
 
+To build binary versions of these tools run the `cli` Makefile target. For example:
+
+```
+$> make cli
+go build -mod vendor -o bin/es-whosonfirst-index cmd/es-whosonfirst-index/main.go
+```
+
 ### es-whosonfirst-index
 
 ```
-> go run -mod vendor cmd/es-whosonfirst-index/main.go -h
+> bin/es-whosonfirst-index -h
   -append-spelunker-v1-properties
 	...
   -elasticsearch-endpoint string
@@ -27,3 +34,11 @@ This is work in progress. Changes should be expected and documentation to follow
   -workers int
     	   ... (default 2)
 ```
+
+## Elasticsearch
+
+This code assumes Elasticsearch 7.x
+
+## See also
+
+* https://github.com/elastic/go-elasticsearch
