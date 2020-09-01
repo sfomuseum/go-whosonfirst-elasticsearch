@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"github.com/cenkalti/backoff/v4"
 	es "github.com/elastic/go-elasticsearch/v7"
-	// "github.com/elastic/go-elasticsearch/v7/estransport"
 	"github.com/elastic/go-elasticsearch/v7/esutil"
 	"github.com/sfomuseum/go-flags/flagset"
 	"github.com/sfomuseum/go-flags/lookup"
@@ -19,8 +18,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	// "os"
-	"runtime"
 	"strconv"
 	"time"
 )
@@ -38,14 +35,14 @@ func NewBulkIndexerFlagSet(ctx context.Context) (*flag.FlagSet, error) {
 
 	fs := flagset.NewFlagSet("bulk")
 
-	fs.String(FLAG_ES_ENDPOINT, "http://localhost:9200", "...")
-	fs.String(FLAG_ES_INDEX, "millsfield", "...")
-	fs.String(FLAG_INDEXER_URI, "repo://", "...")
-	fs.Bool(FLAG_INDEX_ALT, false, "...")
-	fs.Bool(FLAG_INDEX_PROPS, false, "...")
-	fs.Bool(FLAG_INDEX_SPELUNKER_V1, false, "...")
-	fs.Bool(FLAG_APPEND_SPELUNKER_V1, false, "...")
-	fs.Int(FLAG_WORKERS, runtime.NumCPU(), "...")
+	fs.String(FLAG_ES_ENDPOINT, "http://localhost:9200", "A fully-qualified Elasticsearch endpoint.")
+	fs.String(FLAG_ES_INDEX, "millsfield", "A valid Elasticsearch index.")
+	fs.String(FLAG_INDEXER_URI, "repo://", "A valid whosonfirst/go-whosonfirst-index URI string.")
+	fs.Bool(FLAG_INDEX_ALT, false, "Index alternate geometries.")
+	fs.Bool(FLAG_INDEX_PROPS, false, "Only index GeoJSON Feature properties (not geometries).")
+	fs.Bool(FLAG_INDEX_SPELUNKER_V1, false, "Index GeoJSON Feature properties inclusive of auto-generated Whos On First Spelunker properties.")
+	fs.Bool(FLAG_APPEND_SPELUNKER_V1, false, "Append and index auto-generated Whos On First Spelunker properties.")
+	fs.Int(FLAG_WORKERS, 0, "The number of concurrent workers to index data using. Default is the value of runtime.NumCPU().")
 
 	// debug := fs.Bool("debug", false, "...")
 
