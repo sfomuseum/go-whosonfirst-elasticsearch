@@ -2,13 +2,14 @@
 // Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information.
 //
-// Code generated from specification version 7.7.0: DO NOT EDIT
+// Code generated from specification version 7.9.0: DO NOT EDIT
 
 package esapi
 
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -33,7 +34,8 @@ type XPackInfo func(o ...func(*XPackInfoRequest)) (*Response, error)
 // XPackInfoRequest configures the X Pack Info API request.
 //
 type XPackInfoRequest struct {
-	Categories []string
+	AcceptEnterprise *bool
+	Categories       []string
 
 	Pretty     bool
 	Human      bool
@@ -60,6 +62,10 @@ func (r XPackInfoRequest) Do(ctx context.Context, transport Transport) (*Respons
 	path.WriteString("/_xpack")
 
 	params = make(map[string]string)
+
+	if r.AcceptEnterprise != nil {
+		params["accept_enterprise"] = strconv.FormatBool(*r.AcceptEnterprise)
+	}
 
 	if len(r.Categories) > 0 {
 		params["categories"] = strings.Join(r.Categories, ",")
@@ -129,6 +135,14 @@ func (r XPackInfoRequest) Do(ctx context.Context, transport Transport) (*Respons
 func (f XPackInfo) WithContext(v context.Context) func(*XPackInfoRequest) {
 	return func(r *XPackInfoRequest) {
 		r.ctx = v
+	}
+}
+
+// WithAcceptEnterprise - if an enterprise license is installed, return the type and mode as 'enterprise' (default: false).
+//
+func (f XPackInfo) WithAcceptEnterprise(v bool) func(*XPackInfoRequest) {
+	return func(r *XPackInfoRequest) {
+		r.AcceptEnterprise = &v
 	}
 }
 

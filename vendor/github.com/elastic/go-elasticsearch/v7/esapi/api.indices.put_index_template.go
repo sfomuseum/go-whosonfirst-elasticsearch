@@ -2,7 +2,7 @@
 // Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information.
 //
-// Code generated from specification version 7.7.0: DO NOT EDIT
+// Code generated from specification version 7.9.0: DO NOT EDIT
 
 package esapi
 
@@ -29,6 +29,8 @@ func newIndicesPutIndexTemplateFunc(t Transport) IndicesPutIndexTemplate {
 
 // IndicesPutIndexTemplate creates or updates an index template.
 //
+// This API is experimental.
+//
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html.
 //
 type IndicesPutIndexTemplate func(name string, body io.Reader, o ...func(*IndicesPutIndexTemplateRequest)) (*Response, error)
@@ -40,9 +42,9 @@ type IndicesPutIndexTemplateRequest struct {
 
 	Name string
 
+	Cause         string
 	Create        *bool
 	MasterTimeout time.Duration
-	Order         *int
 
 	Pretty     bool
 	Human      bool
@@ -73,16 +75,16 @@ func (r IndicesPutIndexTemplateRequest) Do(ctx context.Context, transport Transp
 
 	params = make(map[string]string)
 
+	if r.Cause != "" {
+		params["cause"] = r.Cause
+	}
+
 	if r.Create != nil {
 		params["create"] = strconv.FormatBool(*r.Create)
 	}
 
 	if r.MasterTimeout != 0 {
 		params["master_timeout"] = formatDuration(r.MasterTimeout)
-	}
-
-	if r.Order != nil {
-		params["order"] = strconv.FormatInt(int64(*r.Order), 10)
 	}
 
 	if r.Pretty {
@@ -156,6 +158,14 @@ func (f IndicesPutIndexTemplate) WithContext(v context.Context) func(*IndicesPut
 	}
 }
 
+// WithCause - user defined reason for creating/updating the index template.
+//
+func (f IndicesPutIndexTemplate) WithCause(v string) func(*IndicesPutIndexTemplateRequest) {
+	return func(r *IndicesPutIndexTemplateRequest) {
+		r.Cause = v
+	}
+}
+
 // WithCreate - whether the index template should only be added if new or can also replace an existing one.
 //
 func (f IndicesPutIndexTemplate) WithCreate(v bool) func(*IndicesPutIndexTemplateRequest) {
@@ -169,14 +179,6 @@ func (f IndicesPutIndexTemplate) WithCreate(v bool) func(*IndicesPutIndexTemplat
 func (f IndicesPutIndexTemplate) WithMasterTimeout(v time.Duration) func(*IndicesPutIndexTemplateRequest) {
 	return func(r *IndicesPutIndexTemplateRequest) {
 		r.MasterTimeout = v
-	}
-}
-
-// WithOrder - the order for this template when merging multiple matching ones (higher numbers are merged later, overriding the lower numbers).
-//
-func (f IndicesPutIndexTemplate) WithOrder(v int) func(*IndicesPutIndexTemplateRequest) {
-	return func(r *IndicesPutIndexTemplateRequest) {
-		r.Order = &v
 	}
 }
 

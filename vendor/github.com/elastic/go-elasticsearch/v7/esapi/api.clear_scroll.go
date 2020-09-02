@@ -2,7 +2,7 @@
 // Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information.
 //
-// Code generated from specification version 7.7.0: DO NOT EDIT
+// Code generated from specification version 7.9.0: DO NOT EDIT
 
 package esapi
 
@@ -27,7 +27,7 @@ func newClearScrollFunc(t Transport) ClearScroll {
 
 // ClearScroll explicitly clears the search context for a scroll.
 //
-// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/search-request-body.html#_clear_scroll_api.
+// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/clear-scroll-api.html.
 //
 type ClearScroll func(o ...func(*ClearScrollRequest)) (*Response, error)
 

@@ -2,7 +2,7 @@
 // Elasticsearch B.V. licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information.
 //
-// Code generated from specification version 7.7.0: DO NOT EDIT
+// Code generated from specification version 7.9.0: DO NOT EDIT
 
 package esapi
 
@@ -28,7 +28,9 @@ func newClusterExistsComponentTemplateFunc(t Transport) ClusterExistsComponentTe
 
 // ClusterExistsComponentTemplate returns information about whether a particular component template exist
 //
-// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-component-templates.html.
+// This API is experimental.
+//
+// See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-component-template.html.
 //
 type ClusterExistsComponentTemplate func(name string, o ...func(*ClusterExistsComponentTemplateRequest)) (*Response, error)
 
