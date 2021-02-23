@@ -14,17 +14,19 @@ import (
 	"github.com/sfomuseum/go-flags/lookup"
 	"github.com/sfomuseum/go-whosonfirst-elasticsearch/document"
 	"github.com/tidwall/gjson"
+	"github.com/whosonfirst/go-whosonfirst-iterate/emitter"
 	"github.com/whosonfirst/go-whosonfirst-iterate/iterator"
 	"io"
 	"io/ioutil"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 )
 
 const FLAG_ES_ENDPOINT string = "elasticsearch-endpoint"
 const FLAG_ES_INDEX string = "elasticsearch-index"
-const FLAG_INDEXER_URI string = "indexer-uri"
+const FLAG_ITERATOR_URI string = "iterator-uri"
 const FLAG_INDEX_ALT string = "index-alt-files"
 const FLAG_INDEX_PROPS string = "index-only-properties"
 const FLAG_INDEX_SPELUNKER_V1 string = "index-spelunker-v1"
@@ -35,9 +37,12 @@ func NewBulkIndexerFlagSet(ctx context.Context) (*flag.FlagSet, error) {
 
 	fs := flagset.NewFlagSet("bulk")
 
+	valid_schemes := strings.Join(emitter.Schemes(), ",")
+	iterator_desc := fmt.Sprintf("A valid whosonfirst/go-whosonfirst-iterator/emitter URI. Supported emitter URI schemes are: %s", valid_schemes)
+
 	fs.String(FLAG_ES_ENDPOINT, "http://localhost:9200", "A fully-qualified Elasticsearch endpoint.")
 	fs.String(FLAG_ES_INDEX, "millsfield", "A valid Elasticsearch index.")
-	fs.String(FLAG_INDEXER_URI, "repo://", "A valid whosonfirst/go-whosonfirst-index URI string.")
+	fs.String(FLAG_ITERATOR_URI, "repo://", iterator_desc)
 	fs.Bool(FLAG_INDEX_ALT, false, "Index alternate geometries.")
 	fs.Bool(FLAG_INDEX_PROPS, false, "Only index GeoJSON Feature properties (not geometries).")
 	fs.Bool(FLAG_INDEX_SPELUNKER_V1, false, "Index GeoJSON Feature properties inclusive of auto-generated Whos On First Spelunker properties.")
@@ -63,7 +68,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 		return nil, err
 	}
 
-	iter_uri, err := lookup.StringVar(fs, FLAG_INDEXER_URI)
+	iter_uri, err := lookup.StringVar(fs, FLAG_ITERATOR_URI)
 
 	if err != nil {
 		return nil, err
@@ -171,7 +176,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 
 	iter_cb := func(ctx context.Context, fh io.ReadSeeker, args ...interface{}) error {
 
-		path, err := iterator.PathForContext(ctx)
+		path, err := emitter.PathForContext(ctx)
 
 		if err != nil {
 			return err
@@ -300,7 +305,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 		return nil, err
 	}
 
-	log.Printf("Processed %d files in %v\n", i.Indexed, time.Since(t1))
+	log.Printf("Processed %d files in %v\n", iter.Seen, time.Since(t1))
 
 	stats := bi.Stats()
 	return &stats, nil

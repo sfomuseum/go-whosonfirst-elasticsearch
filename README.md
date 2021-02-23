@@ -16,23 +16,23 @@ go build -mod vendor -o bin/es-whosonfirst-index cmd/es-whosonfirst-index/main.g
 ### es-whosonfirst-index
 
 ```
-> ./bin/es-whosonfirst-index -h
+$> ./bin/es-whosonfirst-index -h
   -append-spelunker-v1-properties
-    	Append and index auto-generated Whos On First Spelunker properties.
+	Append and index auto-generated Whos On First Spelunker properties.
   -elasticsearch-endpoint string
-    	A fully-qualified Elasticsearch endpoint. (default "http://localhost:9200")
+    			  A fully-qualified Elasticsearch endpoint. (default "http://localhost:9200")
   -elasticsearch-index string
-    	A valid Elasticsearch index. (default "millsfield")
+    		       A valid Elasticsearch index. (default "millsfield")
   -index-alt-files
-    	Index alternate geometries.
+	Index alternate geometries.
   -index-only-properties
-    	Only index GeoJSON Feature properties (not geometries).
+	Only index GeoJSON Feature properties (not geometries).
   -index-spelunker-v1
-    	Index GeoJSON Feature properties inclusive of auto-generated Whos On First Spelunker properties.
-  -indexer-uri string
-    	A valid whosonfirst/go-whosonfirst-index URI string. (default "repo://")
+	Index GeoJSON Feature properties inclusive of auto-generated Whos On First Spelunker properties.
+  -iterator-uri string
+    		A valid whosonfirst/go-whosonfirst-iterator/emitter URI. Supported emitter URI schemes are: directory://,featurecollection://,file://,filelist://,geojsonl://,git://,repo:// (default "repo://")
   -workers int
-    	The number of concurrent workers to index data using. Default is the value of runtime.NumCPU().
+    	   The number of concurrent workers to index data using. Default is the value of runtime.NumCPU().
 ```	
 
 For example:
@@ -57,4 +57,5 @@ This code assumes Elasticsearch 7.x
 ## See also
 
 * https://github.com/elastic/go-elasticsearch
-* https://github.com/whosonfirst/go-whosonfirst-index
+* https://github.com/whosonfirst/go-whosonfirst-iterate
+* https://github.com/whosonfirst/go-whosonfirst-iterate-git
