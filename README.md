@@ -1,8 +1,6 @@
 # go-whosonfirst-elasticsearch
 
-## Important
-
-This is work in progress. Changes should be expected and comprehensive documentation to follow.
+Go package for indexing Who's On First records in Elasticsearch.
 
 ## Tools
 
