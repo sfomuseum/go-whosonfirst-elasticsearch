@@ -14,7 +14,7 @@ import (
 	"github.com/sfomuseum/go-flags/lookup"
 	"github.com/sfomuseum/go-whosonfirst-elasticsearch/document"
 	"github.com/tidwall/gjson"
-	iterator "github.com/whosonfirst/go-whosonfirst-index"
+	"github.com/whosonfirst/go-whosonfirst-iterate/iterator"
 	"io"
 	"io/ioutil"
 	"log"
@@ -63,7 +63,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 		return nil, err
 	}
 
-	idx_uri, err := lookup.StringVar(fs, FLAG_INDEXER_URI)
+	iter_uri, err := lookup.StringVar(fs, FLAG_INDEXER_URI)
 
 	if err != nil {
 		return nil, err
@@ -169,7 +169,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 		return nil, err
 	}
 
-	cb := func(ctx context.Context, fh io.Reader, args ...interface{}) error {
+	iter_cb := func(ctx context.Context, fh io.ReadSeeker, args ...interface{}) error {
 
 		path, err := iterator.PathForContext(ctx)
 
@@ -278,7 +278,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 		return nil
 	}
 
-	i, err := iterator.NewIndexer(idx_uri, cb)
+	iter, err := iterator.NewIterator(ctx, iter_uri, iter_cb)
 
 	if err != nil {
 		return nil, err
@@ -288,7 +288,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 
 	t1 := time.Now()
 
-	err = i.Index(ctx, paths...)
+	err = iter.IterateURIs(ctx, paths...)
 
 	if err != nil {
 		return nil, err

@@ -1,8 +1,7 @@
 package main
 
 import (
-	_ "github.com/whosonfirst/go-whosonfirst-index/fs"
-	_ "github.com/whosonfirst/go-whosonfirst-index-git"
+	_ "github.com/whosonfirst/go-whosonfirst-iterate-git"
 )
 
 import (

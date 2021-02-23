@@ -1,4 +1,4 @@
-// Code generated from specification version 7.9.0 (a479a2a7fce): DO NOT EDIT
+// Code generated from specification version 7.11.0 (8ced7813d6f): DO NOT EDIT
 
 package esapi
 
@@ -28,11 +28,13 @@ type API struct {
 	XPack       *XPack
 
 	AutoscalingDeleteAutoscalingPolicy            AutoscalingDeleteAutoscalingPolicy
+	AutoscalingGetAutoscalingCapacity             AutoscalingGetAutoscalingCapacity
 	AutoscalingGetAutoscalingDecision             AutoscalingGetAutoscalingDecision
 	AutoscalingGetAutoscalingPolicy               AutoscalingGetAutoscalingPolicy
 	AutoscalingPutAutoscalingPolicy               AutoscalingPutAutoscalingPolicy
 	Bulk                                          Bulk
 	ClearScroll                                   ClearScroll
+	ClosePointInTime                              ClosePointInTime
 	Count                                         Count
 	Create                                        Create
 	DanglingIndicesDeleteDanglingIndex            DanglingIndicesDeleteDanglingIndex
@@ -74,6 +76,7 @@ type API struct {
 	Msearch                                       Msearch
 	MsearchTemplate                               MsearchTemplate
 	Mtermvectors                                  Mtermvectors
+	OpenPointInTime                               OpenPointInTime
 	Ping                                          Ping
 	PutScript                                     PutScript
 	RankEval                                      RankEval
@@ -193,7 +196,9 @@ type Indices struct {
 	GetSettings           IndicesGetSettings
 	GetTemplate           IndicesGetTemplate
 	GetUpgrade            IndicesGetUpgrade
+	MigrateToDataStream   IndicesMigrateToDataStream
 	Open                  IndicesOpen
+	PromoteDataStream     IndicesPromoteDataStream
 	PutAlias              IndicesPutAlias
 	PutIndexTemplate      IndicesPutIndexTemplate
 	PutMapping            IndicesPutMapping
@@ -242,6 +247,7 @@ type Remote struct {
 // Snapshot contains the Snapshot APIs
 type Snapshot struct {
 	CleanupRepository SnapshotCleanupRepository
+	Clone             SnapshotClone
 	CreateRepository  SnapshotCreateRepository
 	Create            SnapshotCreate
 	DeleteRepository  SnapshotDeleteRepository
@@ -264,6 +270,7 @@ type Tasks struct {
 type AsyncSearch struct {
 	Delete AsyncSearchDelete
 	Get    AsyncSearchGet
+	Status AsyncSearchStatus
 	Submit AsyncSearchSubmit
 }
 
@@ -374,6 +381,7 @@ type ML struct {
 	UpdateFilter               MLUpdateFilter
 	UpdateJob                  MLUpdateJob
 	UpdateModelSnapshot        MLUpdateModelSnapshot
+	UpgradeJobSnapshot         MLUpgradeJobSnapshot
 	ValidateDetector           MLValidateDetector
 	Validate                   MLValidate
 }
@@ -390,6 +398,7 @@ type Rollup struct {
 	GetCaps      RollupGetRollupCaps
 	GetIndexCaps RollupGetRollupIndexCaps
 	PutJob       RollupPutJob
+	Rollup       RollupRollup
 	Search       RollupRollupSearch
 	StartJob     RollupStartJob
 	StopJob      RollupStopJob
@@ -399,6 +408,7 @@ type Rollup struct {
 type Security struct {
 	Authenticate          SecurityAuthenticate
 	ChangePassword        SecurityChangePassword
+	ClearAPIKeyCache      SecurityClearAPIKeyCache
 	ClearCachedPrivileges SecurityClearCachedPrivileges
 	ClearCachedRealms     SecurityClearCachedRealms
 	ClearCachedRoles      SecurityClearCachedRoles
@@ -417,6 +427,7 @@ type Security struct {
 	GetToken              SecurityGetToken
 	GetUserPrivileges     SecurityGetUserPrivileges
 	GetUser               SecurityGetUser
+	GrantAPIKey           SecurityGrantAPIKey
 	HasPrivileges         SecurityHasPrivileges
 	InvalidateAPIKey      SecurityInvalidateAPIKey
 	InvalidateToken       SecurityInvalidateToken
@@ -447,6 +458,7 @@ type Watcher struct {
 	ExecuteWatch    WatcherExecuteWatch
 	GetWatch        WatcherGetWatch
 	PutWatch        WatcherPutWatch
+	QueryWatches    WatcherQueryWatches
 	Start           WatcherStart
 	Stats           WatcherStats
 	Stop            WatcherStop
@@ -463,11 +475,13 @@ type XPack struct {
 func New(t Transport) *API {
 	return &API{
 		AutoscalingDeleteAutoscalingPolicy:            newAutoscalingDeleteAutoscalingPolicyFunc(t),
+		AutoscalingGetAutoscalingCapacity:             newAutoscalingGetAutoscalingCapacityFunc(t),
 		AutoscalingGetAutoscalingDecision:             newAutoscalingGetAutoscalingDecisionFunc(t),
 		AutoscalingGetAutoscalingPolicy:               newAutoscalingGetAutoscalingPolicyFunc(t),
 		AutoscalingPutAutoscalingPolicy:               newAutoscalingPutAutoscalingPolicyFunc(t),
 		Bulk:                                          newBulkFunc(t),
 		ClearScroll:                                   newClearScrollFunc(t),
+		ClosePointInTime:                              newClosePointInTimeFunc(t),
 		Count:                                         newCountFunc(t),
 		Create:                                        newCreateFunc(t),
 		DanglingIndicesDeleteDanglingIndex:            newDanglingIndicesDeleteDanglingIndexFunc(t),
@@ -509,6 +523,7 @@ func New(t Transport) *API {
 		Msearch:                                       newMsearchFunc(t),
 		MsearchTemplate:                               newMsearchTemplateFunc(t),
 		Mtermvectors:                                  newMtermvectorsFunc(t),
+		OpenPointInTime:                               newOpenPointInTimeFunc(t),
 		Ping:                                          newPingFunc(t),
 		PutScript:                                     newPutScriptFunc(t),
 		RankEval:                                      newRankEvalFunc(t),
@@ -621,7 +636,9 @@ func New(t Transport) *API {
 			GetSettings:           newIndicesGetSettingsFunc(t),
 			GetTemplate:           newIndicesGetTemplateFunc(t),
 			GetUpgrade:            newIndicesGetUpgradeFunc(t),
+			MigrateToDataStream:   newIndicesMigrateToDataStreamFunc(t),
 			Open:                  newIndicesOpenFunc(t),
+			PromoteDataStream:     newIndicesPromoteDataStreamFunc(t),
 			PutAlias:              newIndicesPutAliasFunc(t),
 			PutIndexTemplate:      newIndicesPutIndexTemplateFunc(t),
 			PutMapping:            newIndicesPutMappingFunc(t),
@@ -661,6 +678,7 @@ func New(t Transport) *API {
 		Remote: &Remote{},
 		Snapshot: &Snapshot{
 			CleanupRepository: newSnapshotCleanupRepositoryFunc(t),
+			Clone:             newSnapshotCloneFunc(t),
 			CreateRepository:  newSnapshotCreateRepositoryFunc(t),
 			Create:            newSnapshotCreateFunc(t),
 			DeleteRepository:  newSnapshotDeleteRepositoryFunc(t),
@@ -679,6 +697,7 @@ func New(t Transport) *API {
 		AsyncSearch: &AsyncSearch{
 			Delete: newAsyncSearchDeleteFunc(t),
 			Get:    newAsyncSearchGetFunc(t),
+			Status: newAsyncSearchStatusFunc(t),
 			Submit: newAsyncSearchSubmitFunc(t),
 		},
 		CCR: &CCR{
@@ -779,6 +798,7 @@ func New(t Transport) *API {
 			UpdateFilter:               newMLUpdateFilterFunc(t),
 			UpdateJob:                  newMLUpdateJobFunc(t),
 			UpdateModelSnapshot:        newMLUpdateModelSnapshotFunc(t),
+			UpgradeJobSnapshot:         newMLUpgradeJobSnapshotFunc(t),
 			ValidateDetector:           newMLValidateDetectorFunc(t),
 			Validate:                   newMLValidateFunc(t),
 		},
@@ -791,6 +811,7 @@ func New(t Transport) *API {
 			GetCaps:      newRollupGetRollupCapsFunc(t),
 			GetIndexCaps: newRollupGetRollupIndexCapsFunc(t),
 			PutJob:       newRollupPutJobFunc(t),
+			Rollup:       newRollupRollupFunc(t),
 			Search:       newRollupRollupSearchFunc(t),
 			StartJob:     newRollupStartJobFunc(t),
 			StopJob:      newRollupStopJobFunc(t),
@@ -798,6 +819,7 @@ func New(t Transport) *API {
 		Security: &Security{
 			Authenticate:          newSecurityAuthenticateFunc(t),
 			ChangePassword:        newSecurityChangePasswordFunc(t),
+			ClearAPIKeyCache:      newSecurityClearAPIKeyCacheFunc(t),
 			ClearCachedPrivileges: newSecurityClearCachedPrivilegesFunc(t),
 			ClearCachedRealms:     newSecurityClearCachedRealmsFunc(t),
 			ClearCachedRoles:      newSecurityClearCachedRolesFunc(t),
@@ -816,6 +838,7 @@ func New(t Transport) *API {
 			GetToken:              newSecurityGetTokenFunc(t),
 			GetUserPrivileges:     newSecurityGetUserPrivilegesFunc(t),
 			GetUser:               newSecurityGetUserFunc(t),
+			GrantAPIKey:           newSecurityGrantAPIKeyFunc(t),
 			HasPrivileges:         newSecurityHasPrivilegesFunc(t),
 			InvalidateAPIKey:      newSecurityInvalidateAPIKeyFunc(t),
 			InvalidateToken:       newSecurityInvalidateTokenFunc(t),
@@ -840,6 +863,7 @@ func New(t Transport) *API {
 			ExecuteWatch:    newWatcherExecuteWatchFunc(t),
 			GetWatch:        newWatcherGetWatchFunc(t),
 			PutWatch:        newWatcherPutWatchFunc(t),
+			QueryWatches:    newWatcherQueryWatchesFunc(t),
 			Start:           newWatcherStartFunc(t),
 			Stats:           newWatcherStatsFunc(t),
 			Stop:            newWatcherStopFunc(t),
