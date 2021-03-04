@@ -8,7 +8,7 @@ require (
 	github.com/sfomuseum/go-flags v0.7.0
 	github.com/tidwall/gjson v1.6.8
 	github.com/tidwall/sjson v1.1.5
-	github.com/whosonfirst/go-whosonfirst-iterate v1.0.0
-	github.com/whosonfirst/go-whosonfirst-iterate-git v1.0.0
+	github.com/whosonfirst/go-whosonfirst-iterate v1.1.0
+	github.com/whosonfirst/go-whosonfirst-iterate-git v1.0.2
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.3.0
 )

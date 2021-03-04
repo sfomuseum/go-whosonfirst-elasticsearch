@@ -2,12 +2,12 @@ package git
 
 import (
 	"context"
+	gogit "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/whosonfirst/go-ioutil"
 	"github.com/whosonfirst/go-whosonfirst-iterate/emitter"
 	"github.com/whosonfirst/go-whosonfirst-iterate/filters"
-	"github.com/whosonfirst/go-whosonfirst-iterate/ioutil"
-	gogit "gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
-	"gopkg.in/src-d/go-git.v4/storage/memory"
 	"net/url"
 	"os"
 	"path/filepath"
