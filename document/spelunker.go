@@ -4,6 +4,9 @@ import (
 	"context"
 )
 
+// PrepareSpelunkerV1Document prepares a Who's On First document for indexing with the
+// "v1" Elasticsearch (v2.x) schema. For details please consult:
+// https://github.com/whosonfirst/es-whosonfirst-schema/tree/master/schema/2.4
 func PrepareSpelunkerV1Document(ctx context.Context, body []byte) ([]byte, error) {
 
 	prepped, err := ExtractProperties(ctx, body)
@@ -15,6 +18,9 @@ func PrepareSpelunkerV1Document(ctx context.Context, body []byte) ([]byte, error
 	return AppendSpelunkerV1Properties(ctx, prepped)
 }
 
+// AppendSpelunkerV1Properties appends properties specific to the v1" Elasticsearch (v2.x) schema
+// to a Who's On First document for. For details please consult:
+// https://github.com/whosonfirst/es-whosonfirst-schema/tree/master/schema/2.4
 func AppendSpelunkerV1Properties(ctx context.Context, body []byte) ([]byte, error) {
 
 	var err error

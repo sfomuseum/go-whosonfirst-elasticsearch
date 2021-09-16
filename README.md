@@ -2,6 +2,10 @@
 
 Go package for indexing Who's On First records in Elasticsearch.
 
+## Documentation
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/sfomuseum/go-whosonfirst-elasticsearch.svg)](https://pkg.go.dev/github.com/sfomuseum/go-whosonfirst-elasticsearch)
+
 ## Tools
 
 To build binary versions of these tools run the `cli` Makefile target. For example:

@@ -33,6 +33,7 @@ const FLAG_INDEX_SPELUNKER_V1 string = "index-spelunker-v1"
 const FLAG_APPEND_SPELUNKER_V1 string = "append-spelunker-v1-properties"
 const FLAG_WORKERS string = "workers"
 
+// NewBulkIndexerFlagSet creates a new `flag.FlagSet` instance with command-line flags required by the `es-whosonfirst-index` tool.
 func NewBulkIndexerFlagSet(ctx context.Context) (*flag.FlagSet, error) {
 
 	fs := flagset.NewFlagSet("bulk")
@@ -54,6 +55,7 @@ func NewBulkIndexerFlagSet(ctx context.Context) (*flag.FlagSet, error) {
 	return fs, nil
 }
 
+// RunBulkIndexerWithFlagSet will "bulk" index a set of Who's On First documents with configuration details defined by `fs`.
 func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.BulkIndexerStats, error) {
 
 	es_endpoint, err := lookup.StringVar(fs, FLAG_ES_ENDPOINT)

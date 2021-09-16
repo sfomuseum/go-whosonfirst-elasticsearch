@@ -7,6 +7,7 @@ import (
 	_ "log"
 )
 
+// ...
 func Flatten(ctx context.Context, body []byte) ([]byte, error) {
 
 	var flattened []byte

@@ -7,9 +7,13 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
 	"github.com/whosonfirst/go-whosonfirst-placetypes"
-	"log"
+	_ "log"
 )
 
+// AppendPlacetypeDetails appends addition properties related to the `wof:placetype` and `wof:placetype_alt` properties in a Who's On First record.
+// Specifically:
+// * The unique placetype ID for a placetype
+// * The set of string names (including "alternate" placetypes) associated with a placetype
 func AppendPlacetypeDetails(ctx context.Context, body []byte) ([]byte, error) {
 
 	root := gjson.ParseBytes(body)
@@ -23,9 +27,6 @@ func AppendPlacetypeDetails(ctx context.Context, body []byte) ([]byte, error) {
 	pt_rsp := root.Get("wof:placetype")
 
 	if !pt_rsp.Exists() {
-
-		log.Printf("WHAT %T\n", pt_rsp)
-		log.Println(string(body))
 		return nil, errors.New("Missing wof:placetype property")
 	}
 
@@ -41,14 +42,27 @@ func AppendPlacetypeDetails(ctx context.Context, body []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	placetype_names := []string{
+		pt.Name,
+	}
+
+	alt_rsp := root.Get("wof:placetype_alt")
+
+	if alt_rsp.Exists() {
+		placetype_names = append(placetype_names, alt_rsp.String())
+	}
+
 	details := map[string]interface{}{
 		"wof:placetype_id":    pt.Id,
-		"wof:placetype_names": []string{str_pt},
+		"wof:placetype_names": placetype_names,
 	}
 
 	for k, v := range details {
 
 		path := k
+
+		// Why did I do this... I have no memory of why but I'm going to assume
+		// there was a reason...
 
 		if props_rsp.Exists() {
 			path = fmt.Sprintf("properties.%s", k)
