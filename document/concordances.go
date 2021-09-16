@@ -7,7 +7,7 @@ import (
 	"github.com/tidwall/sjson"
 )
 
-// AppendConcordancesStats appends statistics about the `wof:concordances` properties in a Who's On First record.
+// AppendConcordancesStats appends statistics about the `wof:concordances` properties in a Who's On First document.
 // Specifically:
 // * An array containing the set of source prefixes for concordances
 // * The total number of concordances in a record.
