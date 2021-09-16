@@ -62,7 +62,12 @@ func AppendEDTFRanges(ctx context.Context, body []byte) ([]byte, error) {
 
 	for k, v := range to_assign {
 
-		path := fmt.Sprintf("properties.%s", k)
+		path := k
+
+		if props_rsp.Exists() {
+			path = fmt.Sprintf("properties.%s", k)
+		}
+
 		body, err = sjson.SetBytes(body, path, v)
 
 		if err != nil {

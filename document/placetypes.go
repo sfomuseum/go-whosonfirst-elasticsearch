@@ -61,9 +61,6 @@ func AppendPlacetypeDetails(ctx context.Context, body []byte) ([]byte, error) {
 
 		path := k
 
-		// Why did I do this... I have no memory of why but I'm going to assume
-		// there was a reason...
-
 		if props_rsp.Exists() {
 			path = fmt.Sprintf("properties.%s", k)
 		}
