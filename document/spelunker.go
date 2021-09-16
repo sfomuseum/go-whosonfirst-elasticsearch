@@ -43,6 +43,12 @@ func AppendSpelunkerV1Properties(ctx context.Context, body []byte) ([]byte, erro
 		return nil, err
 	}
 
+	body, err = AppendEDTFRanges(ctx, body)
+
+	if err != nil {
+		return nil, err
+	}
+
 	// to do: categories and machine tags...
 
 	return body, nil

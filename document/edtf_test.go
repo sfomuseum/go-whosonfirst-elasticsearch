@@ -2,19 +2,19 @@ package document
 
 import (
 	"context"
-	"testing"
 	"fmt"
 	"github.com/tidwall/gjson"
+	"testing"
 )
 
-func TestAppendEDTFRanges(t *testing.T){
+func TestAppendEDTFRanges(t *testing.T) {
 
 	ctx := context.Background()
-	
+
 	docs := []string{
 		`{"properties": {"edtf:inception": "1970-01-01", "edtf:cessation": "1980-07-01" }}`,
 		`{"properties": {"edtf:inception": "~1969", "edtf:cessation": "198X" }}`,
-		`{"properties": {"edtf:inception": "~1937-01", "edtf:cessation": "2020-~04" }}`,				
+		`{"properties": {"edtf:inception": "~1937-01", "edtf:cessation": "2020-~04" }}`,
 	}
 
 	for _, body := range docs {
@@ -33,7 +33,7 @@ func TestAppendEDTFRanges(t *testing.T){
 			"date:cessation_inner_start",
 			"date:cessation_inner_end",
 			"date:cessation_outer_start",
-			"date:cessation_outer_end",						
+			"date:cessation_outer_end",
 		}
 
 		for _, k := range expected {
@@ -42,12 +42,11 @@ func TestAppendEDTFRanges(t *testing.T){
 
 			rsp := gjson.GetBytes(new_body, path)
 
-			if !rsp.Exists(){
+			if !rsp.Exists() {
 				t.Fatalf("Updated body missing %s property (%s)", path, string(new_body))
 			}
 		}
-		
+
 		// fmt.Println(string(new_body))
 	}
 }
-

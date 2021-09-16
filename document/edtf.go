@@ -95,7 +95,7 @@ func deriveRanges(props gjson.Result, path string) (*date_range, error) {
 
 	start := edtf_dt.Start
 	end := edtf_dt.End
-	
+
 	start_lower := start.Lower
 	start_upper := start.Upper
 
@@ -109,7 +109,7 @@ func deriveRanges(props gjson.Result, path string) (*date_range, error) {
 	if start_upper == nil {
 		return nil, nil
 	}
-		
+
 	if end_lower == nil {
 		return nil, nil
 	}
@@ -117,7 +117,7 @@ func deriveRanges(props gjson.Result, path string) (*date_range, error) {
 	if end_upper == nil {
 		return nil, nil
 	}
-	
+
 	start_lower_ts := start_lower.Timestamp
 	start_upper_ts := start_upper.Timestamp
 
@@ -131,7 +131,7 @@ func deriveRanges(props gjson.Result, path string) (*date_range, error) {
 	if start_upper_ts == nil {
 		return nil, nil
 	}
-		
+
 	if end_lower_ts == nil {
 		return nil, nil
 	}
@@ -139,7 +139,7 @@ func deriveRanges(props gjson.Result, path string) (*date_range, error) {
 	if end_upper_ts == nil {
 		return nil, nil
 	}
-	
+
 	outer_start := start_lower_ts.Unix()
 	outer_end := end_upper_ts.Unix()
 
