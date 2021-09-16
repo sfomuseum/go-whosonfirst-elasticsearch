@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/sfomuseum/go-edtf"
-	"github.com/sfomuseum/go-edtf/parser"	
+	"github.com/sfomuseum/go-edtf/parser"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
+	_ "log"
 )
 
 type date_span struct {
@@ -53,10 +54,10 @@ func AppendEDTFRanges(ctx context.Context, body []byte) ([]byte, error) {
 	}
 
 	if cessation_range != nil {
-		to_assign["date:inception_inner_start"] = cessation_range.inner.start
-		to_assign["date:inception_inner_end"] = cessation_range.inner.end
-		to_assign["date:inception_outer_start"] = cessation_range.outer.start
-		to_assign["date:inception_outer_end"] = cessation_range.outer.end
+		to_assign["date:cessation_inner_start"] = cessation_range.inner.start
+		to_assign["date:cessation_inner_end"] = cessation_range.inner.end
+		to_assign["date:cessation_outer_start"] = cessation_range.outer.start
+		to_assign["date:cessation_outer_end"] = cessation_range.outer.end
 	}
 
 	for k, v := range to_assign {
@@ -94,19 +95,51 @@ func deriveRanges(props gjson.Result, path string) (*date_range, error) {
 
 	start := edtf_dt.Start
 	end := edtf_dt.End
-
+	
 	start_lower := start.Lower
 	start_upper := start.Upper
 
 	end_lower := end.Lower
 	end_upper := end.Upper
 
+	if start_lower == nil {
+		return nil, nil
+	}
+
+	if start_upper == nil {
+		return nil, nil
+	}
+		
+	if end_lower == nil {
+		return nil, nil
+	}
+
+	if end_upper == nil {
+		return nil, nil
+	}
+	
 	start_lower_ts := start_lower.Timestamp
 	start_upper_ts := start_upper.Timestamp
 
 	end_lower_ts := end_lower.Timestamp
 	end_upper_ts := end_upper.Timestamp
 
+	if start_lower_ts == nil {
+		return nil, nil
+	}
+
+	if start_upper_ts == nil {
+		return nil, nil
+	}
+		
+	if end_lower_ts == nil {
+		return nil, nil
+	}
+
+	if end_upper_ts == nil {
+		return nil, nil
+	}
+	
 	outer_start := start_lower_ts.Unix()
 	outer_end := end_upper_ts.Unix()
 
