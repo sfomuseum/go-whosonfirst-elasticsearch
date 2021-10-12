@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "github.com/whosonfirst/go-whosonfirst-iterate-git"
+	_ "github.com/whosonfirst/go-whosonfirst-iterate-git/v2"
 )
 
 import (

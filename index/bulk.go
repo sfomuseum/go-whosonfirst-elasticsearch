@@ -14,8 +14,8 @@ import (
 	"github.com/sfomuseum/go-flags/lookup"
 	"github.com/sfomuseum/go-whosonfirst-elasticsearch/document"
 	"github.com/tidwall/gjson"
-	"github.com/whosonfirst/go-whosonfirst-iterate/emitter"
-	"github.com/whosonfirst/go-whosonfirst-iterate/iterator"
+	"github.com/whosonfirst/go-whosonfirst-iterate/v2/emitter"
+	"github.com/whosonfirst/go-whosonfirst-iterate/v2/iterator"
 	"io"
 	"io/ioutil"
 	"log"
@@ -176,13 +176,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 		return nil, err
 	}
 
-	iter_cb := func(ctx context.Context, fh io.ReadSeeker, args ...interface{}) error {
-
-		path, err := emitter.PathForContext(ctx)
-
-		if err != nil {
-			return err
-		}
+	iter_cb := func(ctx context.Context, path string, fh io.ReadSeeker, args ...interface{}) error {
 
 		body, err := ioutil.ReadAll(fh)
 
