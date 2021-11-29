@@ -6,7 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/cenkalti/backoff/v4"
+	// "github.com/cenkalti/backoff/v4"
 	"github.com/sfomuseum/go-flags/lookup"
 	"github.com/sfomuseum/go-whosonfirst-elasticsearch/document"
 	"github.com/tidwall/gjson"
@@ -82,7 +82,7 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		}
 	}
 
-	retry := backoff.NewExponentialBackOff()
+	// retry := backoff.NewExponentialBackOff()
 
 	es_client, err := es.NewClient(es.SetURL(es_endpoint))
 
@@ -117,7 +117,11 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 	bi.FlushInterval(30 * time.Second)
 	bi.Workers(workers)
 
-	err = bi.Start()
+	bp, err := bi.Do()
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to 'Do' indexer, %w", err)
+	}
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to start indexer, %w", err)
@@ -135,6 +139,13 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 
 		if !id_rsp.Exists() {
 			msg := fmt.Sprintf("%s is missing properties.wof:id", path)
+			return errors.New(msg)
+		}
+
+		pt_rsp := gjson.GetBytes(body, "properties.wof:placetype")
+
+		if !pt_rsp.Exists() {
+			msg := fmt.Sprintf("%s is missing properties.wof:placetype", path)
 			return errors.New(msg)
 		}
 
@@ -189,28 +200,25 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 			return errors.New(msg)
 		}
 
-		enc_f, err := json.Marshal(f)
+		/*
+			enc_f, err := json.Marshal(f)
 
-		if err != nil {
-			msg := fmt.Sprintf("Failed to marshal %s, %v", path, err)
-			return errors.New(msg)
-		}
+			if err != nil {
+				msg := fmt.Sprintf("Failed to marshal %s, %v", path, err)
+				return errors.New(msg)
+			}
+		*/
 
 		// log.Println(string(enc_f))
 
 		bulk_item := &es.BulkIndexRequest{}
 		bulk_item.Id(doc_id)
 		bulk_item.Index(es_index)
+		bulk_item.Type(pt_rsp.String())
 
 		bulk_item.Doc(f)
 
-		err = bi.Add(ctx, bulk_item)
-
-		if err != nil {
-			log.Printf("Failed to schedule %s, %v", path, err)
-			return nil
-		}
-
+		bp.Add(bulk_item)
 		return nil
 	}
 
@@ -230,13 +238,13 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		return nil, err
 	}
 
-	err = bi.Flush()
+	err = bp.Flush()
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to flush indexer, %w", err)
 	}
 
-	err = bi.Close()
+	err = bp.Close()
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to close indexer, %w", err)
@@ -244,6 +252,6 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 
 	log.Printf("Processed %d files in %v\n", iter.Seen, time.Since(t1))
 
-	stats := bi.Stats()
+	stats := bp.Stats()
 	return &stats, nil
 }
