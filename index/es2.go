@@ -84,49 +84,48 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 
 	retry := backoff.NewExponentialBackOff()
 
-	es_cfg := es.Config{
-		Addresses: []string{es_endpoint},
-
-		RetryOnStatus: []int{502, 503, 504, 429},
-		RetryBackoff: func(i int) time.Duration {
-			if i == 1 {
-				retry.Reset()
-			}
-			return retry.NextBackOff()
-		},
-		MaxRetries: 5,
-	}
-
-	es_client, err := es.NewClient(es_cfg)
+	es_client, err := es.NewClient(es.SetURL(es_endpoint))
 
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = es_client.Indices.Create(es_index)
+	/*
+		_, err = es_client.Indices.Create(es_index)
+
+		if err != nil {
+			return nil, err
+		}
+
+
+		bi_cfg := esutil.BulkIndexerConfig{
+			Index:         es_index,
+			Client:        es_client,
+			NumWorkers:    workers,
+			FlushInterval: 30 * time.Second,
+		}
+
+		bi, err := esutil.NewBulkIndexer(bi_cfg)
+
+		if err != nil {
+			return nil, err
+		}
+	*/
+
+	bi := es.NewBulkProcessorService(es_client)
+
+	bi.FlushInterval(30 * time.Second)
+	bi.Workers(workers)
+
+	err = bi.Start()
 
 	if err != nil {
-		return nil, err
-	}
-
-	// https://github.com/elastic/go-elasticsearch/blob/master/_examples/bulk/indexer.go
-
-	bi_cfg := esutil.BulkIndexerConfig{
-		Index:         es_index,
-		Client:        es_client,
-		NumWorkers:    workers,
-		FlushInterval: 30 * time.Second,
-	}
-
-	bi, err := esutil.NewBulkIndexer(bi_cfg)
-
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to start indexer, %w", err)
 	}
 
 	iter_cb := func(ctx context.Context, path string, fh io.ReadSeeker, args ...interface{}) error {
 
-		body, err := ioutil.ReadAll(fh)
+		body, err := io.ReadAll(fh)
 
 		if err != nil {
 			return err
@@ -199,23 +198,11 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 
 		// log.Println(string(enc_f))
 
-		bulk_item := esutil.BulkIndexerItem{
-			Action:     "index",
-			DocumentID: doc_id,
-			Body:       bytes.NewReader(enc_f),
+		bulk_item := &es.BulkIndexRequest{}
+		bulk_item.Id(doc_id)
+		bulk_item.Index(es_index)
 
-			OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem) {
-				// log.Printf("Indexed %s\n", path)
-			},
-
-			OnFailure: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem, err error) {
-				if err != nil {
-					log.Printf("ERROR: Failed to index %s, %s", path, err)
-				} else {
-					log.Printf("ERROR: Failed to index %s, %s: %s", path, res.Error.Type, res.Error.Reason)
-				}
-			},
-		}
+		bulk_item.Doc(f)
 
 		err = bi.Add(ctx, bulk_item)
 
@@ -243,10 +230,16 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		return nil, err
 	}
 
-	err = bi.Close(ctx)
+	err = bi.Flush()
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to flush indexer, %w", err)
+	}
+
+	err = bi.Close()
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to close indexer, %w", err)
 	}
 
 	log.Printf("Processed %d files in %v\n", iter.Seen, time.Since(t1))
