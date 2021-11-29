@@ -175,5 +175,10 @@ golang.org/x/sys/execabs
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
+# gopkg.in/olivere/elastic.v3 v3.0.75
+## explicit
+gopkg.in/olivere/elastic.v3
+gopkg.in/olivere/elastic.v3/backoff
+gopkg.in/olivere/elastic.v3/uritemplates
 # gopkg.in/warnings.v0 v0.1.2
 gopkg.in/warnings.v0
