@@ -2,10 +2,20 @@ package index
 
 import (
 	"context"
-	"flag"
-	es "gopkg.in/olivere/elastic.v3"
+	"encoding/json"
 	"errors"
-	"github.com/cenkalti/backoff/v4"	
+	"flag"
+	"fmt"
+	"github.com/cenkalti/backoff/v4"
+	"github.com/sfomuseum/go-flags/lookup"
+	"github.com/sfomuseum/go-whosonfirst-elasticsearch/document"
+	"github.com/tidwall/gjson"
+	"github.com/whosonfirst/go-whosonfirst-iterate/v2/iterator"
+	es "gopkg.in/olivere/elastic.v3"
+	"io"
+	"log"
+	"strconv"
+	"time"
 )
 
 // RunBulkIndexerWithFlagSet will "bulk" index a set of Who's On First documents with configuration details defined by `fs`.
@@ -86,21 +96,6 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		},
 		MaxRetries: 5,
 	}
-
-	/*
-
-		if debug {
-
-			es_logger := &estransport.ColorLogger{
-				Output:             os.Stdout,
-				EnableRequestBody:  true,
-				EnableResponseBody: true,
-			}
-
-			es_cfg.Logger = es_logger
-		}
-
-	*/
 
 	es_client, err := es.NewClient(es_cfg)
 

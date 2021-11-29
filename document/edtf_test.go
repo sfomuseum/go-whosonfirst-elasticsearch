@@ -14,8 +14,8 @@ func TestAppendEDTFRanges(t *testing.T) {
 	docs := []string{
 		`{"properties": {"edtf:inception": "1970-01-01", "edtf:cessation": "1980-07-01" }}`,
 		`{"properties": {"edtf:inception": "~1969", "edtf:cessation": "198X" }}`,
-		`{"properties": {"edtf:inception": "~1937-01", "edtf:cessation": "2020-~04" }}`,	
-		`{"properties": {"edtf:inception": "2021-10-10T00:24:00Z", "edtf:cessation": "2021-10-10T00:24:00Z" }}`,	
+		`{"properties": {"edtf:inception": "~1937-01", "edtf:cessation": "2020-~04" }}`,
+		`{"properties": {"edtf:inception": "2021-10-10T00:24:00Z", "edtf:cessation": "2021-10-10T00:24:00Z" }}`,
 	}
 
 	for _, body := range docs {
