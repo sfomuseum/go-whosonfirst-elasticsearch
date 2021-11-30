@@ -146,7 +146,9 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 
 		if !pt_rsp.Exists() {
 			msg := fmt.Sprintf("%s is missing properties.wof:placetype", path)
-			return errors.New(msg)
+			log.Println(msg)
+			return nil
+			// return errors.New(msg)
 		}
 
 		wof_id := id_rsp.Int()
@@ -238,12 +240,14 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		return nil, err
 	}
 
+	log.Println("Flush")
 	err = bp.Flush()
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to flush indexer, %w", err)
 	}
 
+	log.Println("Close")
 	err = bp.Close()
 
 	if err != nil {
