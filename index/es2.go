@@ -115,12 +115,22 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 	// https://github.com/olivere/elastic/wiki/BulkProcessor
 	// ugh, method chaining...
 
+	beforeCallback := func(executionId int64, requests []es.BulkableRequest) {
+		log.Printf("Before commit %d\n", executionId)
+	}
+
+	afterCallback := func(executionId int64, requests []es.BulkableRequest, response *es.BulkResponse, err error) {
+		log.Printf("After commit %d, %v\n", executionId, err)
+	}
+
 	bp, err := es_client.BulkProcessor().
 		Name("Indexer").
 		FlushInterval(30 * time.Second).
 		Workers(workers).
 		BulkActions(1000).
 		Stats(true).
+		Before(beforeCallback).
+		After(afterCallback).
 		Do()
 
 	if err != nil {
