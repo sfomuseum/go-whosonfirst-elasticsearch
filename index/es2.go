@@ -112,19 +112,19 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		}
 	*/
 
-	bi := es.NewBulkProcessorService(es_client)
+	// https://github.com/olivere/elastic/wiki/BulkProcessor
+	// ugh, method chaining...
 
-	bi.FlushInterval(30 * time.Second)
-	bi.Workers(workers)
-
-	bp, err := bi.Do()
+	bp, err := es_client.BulkProcessor().
+		Name("Indexer").
+		FlushInterval(30 * time.Second).
+		Workers(workers).
+		BulkActions(1000).
+		Stats(true).
+		Do()
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to 'Do' indexer, %w", err)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to start indexer, %w", err)
 	}
 
 	iter_cb := func(ctx context.Context, path string, fh io.ReadSeeker, args ...interface{}) error {
@@ -201,15 +201,6 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 			msg := fmt.Sprintf("Failed to unmarshal %s, %v", path, err)
 			return errors.New(msg)
 		}
-
-		/*
-			enc_f, err := json.Marshal(f)
-
-			if err != nil {
-				msg := fmt.Sprintf("Failed to marshal %s, %v", path, err)
-				return errors.New(msg)
-			}
-		*/
 
 		// log.Println(string(enc_f))
 
