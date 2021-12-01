@@ -1,5 +1,8 @@
 package index
 
+// https://github.com/olivere/elastic/wiki/BulkProcessor
+// https://gist.github.com/olivere/a1dd52fc28cdfbbd6d4f
+
 import (
 	"context"
 	"encoding/json"
@@ -82,46 +85,21 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		}
 	}
 
-	// retry := backoff.NewExponentialBackOff()
-
 	es_client, err := es.NewClient(es.SetURL(es_endpoint))
 
 	if err != nil {
 		return nil, err
 	}
 
-	/*
-		_, err = es_client.Indices.Create(es_index)
-
-		if err != nil {
-			return nil, err
-		}
-
-
-		bi_cfg := esutil.BulkIndexerConfig{
-			Index:         es_index,
-			Client:        es_client,
-			NumWorkers:    workers,
-			FlushInterval: 30 * time.Second,
-		}
-
-		bi, err := esutil.NewBulkIndexer(bi_cfg)
-
-		if err != nil {
-			return nil, err
-		}
-	*/
-
-	// https://github.com/olivere/elastic/wiki/BulkProcessor
-	// ugh, method chaining...
-
-	beforeCallback := func(executionId int64, requests []es.BulkableRequest) {
-		log.Printf("Before commit %d\n", executionId)
+	beforeCallback := func(executionId int64, req []es.BulkableRequest) {
+		log.Printf("Before commit %d, %d items\n", executionId, len(req))
 	}
 
-	afterCallback := func(executionId int64, requests []es.BulkableRequest, response *es.BulkResponse, err error) {
+	afterCallback := func(executionId int64, requests []es.BulkableRequest, rsp *es.BulkResponse, err error) {
 		log.Printf("After commit %d, %v\n", executionId, err)
 	}
+
+	// ugh, method chaining...
 
 	bp, err := es_client.BulkProcessor().
 		Name("Indexer").
@@ -212,14 +190,13 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 			return errors.New(msg)
 		}
 
-		// log.Println(string(enc_f))
+		// Ugh... method chaning
 
-		bulk_item := &es.BulkIndexRequest{}
-		bulk_item.Id(doc_id)
-		bulk_item.Index(es_index)
-		bulk_item.Type(pt_rsp.String())
-
-		bulk_item.Doc(f)
+		bulk_item := es.NewBulkIndexRequest().
+			Id(doc_id).
+			Index(es_index).
+			Type(pt_rsp.String()).
+			Doc(f)
 
 		bp.Add(bulk_item)
 		return nil
