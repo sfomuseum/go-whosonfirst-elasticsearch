@@ -97,7 +97,6 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 	}
 
 	afterCallback := func(executionId int64, requests []es.BulkableRequest, rsp *es.BulkResponse, err error) {
-		log.Printf("After commit %d, %v\n", executionId, err)
 
 		if err != nil {
 			log.Printf("Commit ID %d failed with error %v\n", executionId, err)
@@ -232,14 +231,12 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		return nil, err
 	}
 
-	log.Println("Flush")
 	err = bp.Flush()
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to flush indexer, %w", err)
 	}
 
-	log.Println("Close")
 	err = bp.Close()
 
 	if err != nil {
