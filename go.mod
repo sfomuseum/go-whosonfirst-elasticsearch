@@ -17,5 +17,6 @@ require (
 	github.com/whosonfirst/go-whosonfirst-iterate-git/v2 v2.0.0
 	github.com/whosonfirst/go-whosonfirst-iterate/v2 v2.0.1
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.3.0
+	github.com/whosonfirst/go-whosonfirst-uri v1.1.0
 	gopkg.in/olivere/elastic.v3 v3.0.75
 )

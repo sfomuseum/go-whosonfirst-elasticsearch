@@ -14,6 +14,7 @@ import (
 	"github.com/sfomuseum/go-whosonfirst-elasticsearch/document"
 	"github.com/tidwall/gjson"
 	"github.com/whosonfirst/go-whosonfirst-iterate/v2/iterator"
+	"github.com/whosonfirst/go-whosonfirst-uri"
 	es "gopkg.in/olivere/elastic.v3"
 	"io"
 	"log"
@@ -92,11 +93,15 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 	}
 
 	beforeCallback := func(executionId int64, req []es.BulkableRequest) {
-		log.Printf("Before commit %d, %d items\n", executionId, len(req))
+		// log.Printf("Before commit %d, %d items\n", executionId, len(req))
 	}
 
 	afterCallback := func(executionId int64, requests []es.BulkableRequest, rsp *es.BulkResponse, err error) {
 		log.Printf("After commit %d, %v\n", executionId, err)
+
+		if err != nil {
+			log.Printf("Commit ID %d failed with error %v\n", executionId, err)
+		}
 	}
 
 	// ugh, method chaining...
@@ -117,6 +122,16 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 
 	iter_cb := func(ctx context.Context, path string, fh io.ReadSeeker, args ...interface{}) error {
 
+		_, uri_args, err := uri.ParseURI(path)
+
+		if err != nil {
+			return fmt.Errorf("Failed to parse %s, %v", path, err)
+		}
+
+		if uri_args.IsAlternate {
+			return nil
+		}
+
 		body, err := io.ReadAll(fh)
 
 		if err != nil {
@@ -133,8 +148,7 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		pt_rsp := gjson.GetBytes(body, "properties.wof:placetype")
 
 		if !pt_rsp.Exists() {
-			msg := fmt.Sprintf("%s is missing properties.wof:placetype", path)
-			log.Println(msg)
+			log.Printf("%s is missing properties.wof:placetype\n", path)
 			return nil
 			// return errors.New(msg)
 		}
