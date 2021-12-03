@@ -49,12 +49,14 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		return nil, err
 	}
 
+	/*
 	index_alt, err := lookup.BoolVar(fs, FLAG_INDEX_ALT)
 
 	if err != nil {
 		return nil, err
 	}
-
+	*/
+	
 	index_only_props, err := lookup.BoolVar(fs, FLAG_INDEX_PROPS)
 
 	if err != nil {
@@ -162,17 +164,9 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		wof_id := id_rsp.Int()
 		doc_id := strconv.FormatInt(wof_id, 10)
 
-		alt_rsp := gjson.GetBytes(body, "properties.src:alt_label")
-
-		if alt_rsp.Exists() {
-
-			if !index_alt {
-				return nil
-			}
-
-			doc_id = fmt.Sprintf("%s-%s", doc_id, alt_rsp.String())
-		}
-
+		// TO DO: UPDATE EDTF PROPERTIES HERE
+		// https://github.com/whosonfirst/go-whosonfirst-edtf
+		
 		// START OF manipulate body here...
 
 		prepare_funcs := make([]document.PrepareDocumentFunc, 0)
