@@ -1,0 +1,38 @@
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - id: wof-edtf-find-invalid
+    main: ./cmd/wof-edtf-find-invalid
+    binary: wof-edtf-find-invalid
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+  - id: wof-edtf-update-unknown-uncertain
+    main: ./cmd/wof-edtf-update-unknown-uncertain
+    binary: wof-edtf-update-unknown-uncertain
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  -
+    format: binary
+    replacements:
+      386: i386
+      amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

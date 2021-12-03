@@ -15,6 +15,7 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/whosonfirst/go-whosonfirst-iterate/v2/iterator"
 	"github.com/whosonfirst/go-whosonfirst-uri"
+	"github.com/whosonfirst/go-whosonfirst-edtf"	
 	es "gopkg.in/olivere/elastic.v3"
 	"io"
 	"log"
@@ -164,8 +165,14 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		wof_id := id_rsp.Int()
 		doc_id := strconv.FormatInt(wof_id, 10)
 
-		// TO DO: UPDATE EDTF PROPERTIES HERE
+		// TO DO: move this in to the relevant document.Prepare method
 		// https://github.com/whosonfirst/go-whosonfirst-edtf
+
+		_, body, err = edtf.UpdateBytes(body)
+
+		if err != nil {
+			log.Printf("Failed to apply EDTF updates for %s, %v\n", path, err)
+		}
 		
 		// START OF manipulate body here...
 
@@ -188,7 +195,8 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 			new_body, err := f(ctx, body)
 
 			if err != nil {
-				return err
+				log.Printf("Failed to prepare body for %s (%v), %v\n", path, f, err)
+				return nil
 			}
 
 			body = new_body
