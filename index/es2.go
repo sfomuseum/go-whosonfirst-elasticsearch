@@ -123,8 +123,15 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 
 		_, uri_args, err := uri.ParseURI(path)
 
+		// Insert debate about whether or not to be strict in situations like this here.
+		// The problem with being strict is that it causes things like the automated
+		// Spelunker indexing to fail when, more likely, what we want is some sort of
+		// abstract "notify someone" system to record events like this. For now we will
+		// simply notify the log files.
+		
 		if err != nil {
-			return fmt.Errorf("Failed to parse %s, %v", path, err)
+			log.Printf("Failed to parse %s, %v", path, err)
+			return nil
 		}
 
 		if uri_args.IsAlternate {
