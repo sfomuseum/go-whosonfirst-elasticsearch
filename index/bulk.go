@@ -228,7 +228,7 @@ func RunBulkIndexerOptionsFromFlagSet(ctx context.Context, fs *flag.FlagSet) (*R
 		return nil, fmt.Errorf("Failed to derive default prepare funcs from flagset, %w", err)
 	}
 
-	iterator_paths := flag.Args()
+	iterator_paths := fs.Args()
 
 	opts := &RunBulkIndexerOptions{
 		BulkIndexer:   bi,
