@@ -12,12 +12,12 @@ require (
 	github.com/elastic/go-elasticsearch/v7 v7.13.0
 	github.com/sfomuseum/go-edtf v0.3.1
 	github.com/sfomuseum/go-flags v0.8.2
-	github.com/tidwall/gjson v1.12.1
-	github.com/tidwall/sjson v1.2.3
+	github.com/tidwall/gjson v1.14.0
+	github.com/tidwall/sjson v1.2.4
 	github.com/whosonfirst/go-whosonfirst-edtf v0.3.0
-	github.com/whosonfirst/go-whosonfirst-iterate-git/v2 v2.0.0
+	github.com/whosonfirst/go-whosonfirst-iterate-git/v2 v2.1.0
 	github.com/whosonfirst/go-whosonfirst-iterate/v2 v2.0.1
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.3.0
-	github.com/whosonfirst/go-whosonfirst-uri v1.1.0
+	github.com/whosonfirst/go-whosonfirst-uri v1.2.0
 	gopkg.in/olivere/elastic.v3 v3.0.75
 )
