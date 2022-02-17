@@ -13,9 +13,9 @@ import (
 	"github.com/sfomuseum/go-flags/lookup"
 	"github.com/sfomuseum/go-whosonfirst-elasticsearch/document"
 	"github.com/tidwall/gjson"
+	"github.com/whosonfirst/go-whosonfirst-edtf"
 	"github.com/whosonfirst/go-whosonfirst-iterate/v2/iterator"
 	"github.com/whosonfirst/go-whosonfirst-uri"
-	"github.com/whosonfirst/go-whosonfirst-edtf"	
 	es "gopkg.in/olivere/elastic.v3"
 	"io"
 	"log"
@@ -51,13 +51,13 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 	}
 
 	/*
-	index_alt, err := lookup.BoolVar(fs, FLAG_INDEX_ALT)
+		index_alt, err := lookup.BoolVar(fs, FLAG_INDEX_ALT)
 
-	if err != nil {
-		return nil, err
-	}
+		if err != nil {
+			return nil, err
+		}
 	*/
-	
+
 	index_only_props, err := lookup.BoolVar(fs, FLAG_INDEX_PROPS)
 
 	if err != nil {
@@ -131,7 +131,7 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		// Spelunker indexing to fail when, more likely, what we want is some sort of
 		// abstract "notify someone" system to record events like this. For now we will
 		// simply notify the log files.
-		
+
 		if err != nil {
 			log.Printf("Failed to parse %s, %v", path, err)
 			return nil
@@ -173,7 +173,7 @@ func RunES2BulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*es.Bu
 		if err != nil {
 			log.Printf("Failed to apply EDTF updates for %s, %v\n", path, err)
 		}
-		
+
 		// START OF manipulate body here...
 
 		prepare_funcs := make([]document.PrepareDocumentFunc, 0)
