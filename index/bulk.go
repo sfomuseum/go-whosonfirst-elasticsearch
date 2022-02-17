@@ -32,11 +32,17 @@ const FLAG_INDEX_SPELUNKER_V1 string = "index-spelunker-v1"
 const FLAG_APPEND_SPELUNKER_V1 string = "append-spelunker-v1-properties"
 const FLAG_WORKERS string = "workers"
 
+// type RunBulkIndexerOptions contains runtime configurations for bulk indexing
 type RunBulkIndexerOptions struct {
-	BulkIndexer   esutil.BulkIndexer
-	PrepareFuncs  []document.PrepareDocumentFunc
-	IteratorURI   string
+	// BulkIndexer is a `esutil.BulkIndexer` instance
+	BulkIndexer esutil.BulkIndexer
+	// PrepareFuncs are one or more `document.PrepareDocumentFunc` used to transform a document before indexing
+	PrepareFuncs []document.PrepareDocumentFunc
+	// IteratorURI is a valid `whosonfirst/go-whosonfirst-iterate/v2` URI string.
+	IteratorURI string
+	// IteratorPaths are one or more valid `whosonfirst/go-whosonfirst-iterate/v2` paths to iterate over
 	IteratorPaths []string
+	// IndexAltFiles is a boolean value indicating whether or not to index "alternate geometry" files
 	IndexAltFiles bool
 }
 
@@ -114,6 +120,7 @@ func PrepareFuncsFromFlagSet(ctx context.Context, fs *flag.FlagSet) ([]document.
 	return prepare_funcs, nil
 }
 
+// BulkIndexerFromFlagSet returns a esutil.BulkIndexer instance derived from the values in 'fs'.
 func BulkIndexerFromFlagSet(ctx context.Context, fs *flag.FlagSet) (esutil.BulkIndexer, error) {
 
 	es_endpoint, err := lookup.StringVar(fs, FLAG_ES_ENDPOINT)
@@ -194,6 +201,7 @@ func BulkIndexerFromFlagSet(ctx context.Context, fs *flag.FlagSet) (esutil.BulkI
 	return bi, nil
 }
 
+// RunBulkIndexerOptionsFromFlagSet returns a `RunBulkIndexerOptions` instance derived from the values in 'fs'.
 func RunBulkIndexerOptionsFromFlagSet(ctx context.Context, fs *flag.FlagSet) (*RunBulkIndexerOptions, error) {
 
 	iterator_uri, err := lookup.StringVar(fs, FLAG_ITERATOR_URI)
@@ -233,7 +241,7 @@ func RunBulkIndexerOptionsFromFlagSet(ctx context.Context, fs *flag.FlagSet) (*R
 	return opts, nil
 }
 
-// RunBulkIndexerWithFlagSet will "bulk" index a set of Who's On First documents with configuration details defined by `fs`.
+// RunBulkIndexerWithFlagSet will "bulk" index a set of Who's On First documents with configuration details defined in 'fs'.
 func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.BulkIndexerStats, error) {
 
 	opts, err := RunBulkIndexerOptionsFromFlagSet(ctx, fs)
@@ -245,6 +253,7 @@ func RunBulkIndexerWithFlagSet(ctx context.Context, fs *flag.FlagSet) (*esutil.B
 	return RunBulkIndexer(ctx, opts)
 }
 
+// RunBulkIndexer will "bulk" index a set of Who's On First documents with configuration details defined in 'opts'.
 func RunBulkIndexer(ctx context.Context, opts *RunBulkIndexerOptions) (*esutil.BulkIndexerStats, error) {
 
 	bi := opts.BulkIndexer
